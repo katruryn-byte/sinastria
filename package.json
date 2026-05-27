@@ -1,9 +1,11 @@
 {
-  "name": "astralia",
+  "name": "sinastria",
   "version": "1.0.0",
-  "description": "Astral IA - Leituras Astrologicas com Inteligencia Artificial",
+  "description": "Sinastria (premium) - Astralia.online",
+  "private": true,
   "dependencies": {
-    "mercadopago": "^2.0.6",
-    "redis": "^4.6.13"
+    "mercadopago": "^2.0.15",
+    "redis": "^4.6.13",
+    "tz-lookup": "^6.1.25"
   }
 }
