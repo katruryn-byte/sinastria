@@ -419,7 +419,7 @@ function construirSinastria(dados) {
     prompt: prompt,
     metadados: {
       framework: "Sinastria Master + Diretrizes Técnicas + Framework Astralia",
-      modeloRecomendado: "claude-opus-4-7",
+      modeloRecomendado: "claude-sonnet-4-6",
       palavrasEsperadas: versao === "premium" ? "15.000-18.000" : "10.000-12.000",
       tipo: "premium_assincrono_48h",
       saida: "JSON estruturado por seções (renderização de PDF é camada separada)",
@@ -612,8 +612,145 @@ function formatarAspectos(aspectos) {
 }
 
 // EXPORTAR
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MODERNIZAÇÃO — calibragem por tipo, estrutura macro, chunk e ponte síncrona
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Calibragem do tom/eixo conforme o tipo de relação (campo dados.tipoRelacao)
+const TIPOS_SINASTRIA = {
+  amorosa: "AMOROSA — entre parceiros românticos. Eixo: atração, intimidade, química sexual (Vênus-Marte), linguagens do amor, futuro a dois. Vênus-Marte = magnetismo físico.",
+  profissional: "PROFISSIONAL — entre sócios ou colegas. Eixo: complementaridade de habilidades, divisão de poder, comunicação, confiança e entrega. Vênus-Marte = sintonia criativa e ritmo de trabalho (NÃO leitura sexual). Saturno = responsabilidade e contrato.",
+  familiar: "FAMILIAR — entre pais e filhos, irmãos. Eixo: padrões herdados, dinâmica de cuidado e autoridade, feridas transgeracionais, como se nutrem e se ferem. Lua = cuidado; Saturno = autoridade e cobrança. Sem leitura sexual.",
+  amizade: "AMIZADE — entre amigos íntimos. Eixo: lealdade, suporte mútuo, crescimento, lazer compartilhado e durabilidade do vínculo. Sem leitura sexual."
+};
+
+// Estrutura macro (17 seções legíveis; os subtópicos são obrigatórios DENTRO de cada uma)
+const ESTRUTURA_SINASTRIA = `
+## ESTRUTURA DO RELATÓRIO — 17 seções macro (cada uma desenvolvida com profundidade; os subtópicos são OBRIGATÓRIOS dentro da seção, em prosa corrida)
+
+ATO 1 — O ENCONTRO
+1. CARTA INICIAL — o que é a sinastria de vocês, como ler este material, o que ela revela e o que não promete. Acolhimento. (~500)
+2. OS DOIS MAPAS, LADO A LADO — síntese de quem é cada um (Sol, Lua, Ascendente, Vênus e Marte de cada, COM OS GRAUS); o que cada um traz para a relação antes mesmo do encontro. (~800)
+3. PRIMEIRA IMPRESSÃO — por que vocês se atraíram (ou se estranharam): Ascendentes, Sol-Lua cruzados e os primeiros aspectos que saltam. (~700)
+
+ATO 2 — VOCÊ PRIMEIRO
+4. COMO CADA UM AMA E O QUE REPETE — antes do casal, o padrão individual (Vênus e Lua natais de cada um, feridas que cada um carrega); a relação só se entende quando cada um se vê. (~700)
+
+ATO 3 — A QUÍMICA REAL
+5. A QUÍMICA ENTRE VOCÊS — atração e magnetismo: Vênus-Marte (com grau e orbe), Sol-Lua, conjunções de impacto; o que acende. (~800)
+6. COMO VOCÊS SE COMPLEMENTAM — presentes mútuos: trígonos e sextis, casas interceptadas (um planeta caindo nas casas do outro), o que um oferece que o outro precisava. (~800)
+7. COMO VOCÊS SE COMUNICAM — Mercúrio cruzado: onde se entendem sem palavras e onde nascem ruídos e mal-entendidos; o caminho da escuta. (~600)
+8. AS LINGUAGENS DO AMOR, NA PRÁTICA — manual de convivência: como CADA UM precisa receber afeto (frases diretas: "para [Nome] se sentir amado/valorizado, faça X"); Vênus por elemento de cada um. (~700)
+9. COMO VOCÊS AGEM JUNTOS — Marte cruzado: cooperação, ritmo, onde a energia soma e onde atrita; decisões e conflitos práticos. (~600)
+
+ATO 3.5 — AS SOMBRAS (honestidade sem condenação)
+10. OS DESAFIOS DA RELAÇÃO — aspectos tensos (quadraturas e oposições, com grau e orbe): o que pede crescimento, sempre com o caminho de travessia. (~800)
+11. SATURNO — O PROFESSOR DA RELAÇÃO — estrutura que sustenta vs. peso que esfria; frieza, cobrança, "contrato de trabalho"; como trazer leveza. (~500)
+12. PLUTÃO E NETUNO — PODER E ILUSÃO — os ganchos de sombra: dinâmicas de controle/possessividade/ciúme (Plutão) e de idealização/codependência/perda de si (Netuno), SEMPRE nomeadas como dinâmica ancorada no aspecto real, com o caminho de autonomia e limites. (~700)
+
+ATO 4 — A TRANSFORMAÇÃO
+13. INTIMIDADE E CONFIANÇA — química real vs. fantasia, vulnerabilidade consentida, o que constrói (ou corrói) a confiança entre vocês. (~600)
+14. O PROPÓSITO DO ENCONTRO — Nodos Lunares cruzados e o karma do casal: relação evolutiva (que faz crescer) ou kármica (que veio ensinar); o que vocês vieram fazer um pelo outro. (~700)
+15. QUE TIPO DE RELAÇÃO É A DE VOCÊS — síntese pelos 7 padrões (almas evolutivas, complementaridade, espelho kármico, atração intensa, poder, crescimento pelo atrito, jupiteriana); qual é o de vocês e o que isso significa. (~600)
+
+ATO 5 — O CAMINHO
+16. O QUE A RELAÇÃO PEDE DE CADA UM + O POTENCIAL DE VOCÊS JUNTOS — o trabalho de cada lado, a melhor versão que pode emergir e um plano prático dos próximos passos. (~900)
+17. MENSAGEM FINAL + PRÓXIMOS PASSOS NA ASTRALIA — fechamento que empodera (a escolha é de vocês; relações se reconstroem a cada ciclo de consciência) + 1-2 chamadas individuais no gancho real. (~500)
+`;
+
+// Faixas de seções para geração em partes (chunk) — evita estourar 30k tokens por chamada
+const SECOES_POR_PARTE_SIN = {
+  completo: [1, 17],
+  parte1:   [1, 6],
+  parte2:   [7, 12],
+  parte3:   [13, 17]
+};
+
+// Corpo de conhecimento reusado pela ponte síncrona
+function montarConhecimentoSinastria() {
+  return [
+    MENSAGEM_CENTRAL,
+    ENREDO_5_ATOS,
+    LINGUAGEM_SOFISTICADA,
+    REFUTACAO_PESSOAS_REAIS,
+    TERAPIA_AMOR_PROPRIO,
+    INDICADORES_TECNICOS,
+    PADROES_CASAL,
+    CATEGORIAS_FRAMEWORK,
+    CHECKLIST_QUALIDADE
+  ].join("\n\n");
+}
+
+// PONTE SÍNCRONA — buildPromptSinastria(dados, mapaAInfo, mapaBInfo, aspectosInfo, parte)
+// dados: { nomeA, nomeB, tipoRelacao, estagio?, questao?, horaBausente? }
+// mapaAInfo / mapaBInfo: mapas já formatados em texto; aspectosInfo: aspectos A×B em texto.
+// parte: "completo" | "parte1" | "parte2" | "parte3" (chunk).
+function buildPromptSinastria(dados, mapaAInfo, mapaBInfo, aspectosInfo, parte = "completo") {
+  const nomeA = dados.nomeA || (dados.pessoa1 && dados.pessoa1.nome) || '[PESSOA A]';
+  const nomeB = dados.nomeB || (dados.pessoa2 && dados.pessoa2.nome) || '[PESSOA B]';
+  const tipo = (dados.tipoRelacao || 'amorosa').toLowerCase();
+  const calibragem = TIPOS_SINASTRIA[tipo] || TIPOS_SINASTRIA.amorosa;
+  const faixa = SECOES_POR_PARTE_SIN[parte] || SECOES_POR_PARTE_SIN.completo;
+  const ini = faixa[0], fim = faixa[1];
+  const escopo = parte === "completo"
+    ? "Gere TODAS as 17 seções, na ordem."
+    : `Esta é a ${parte}. Gere SOMENTE as seções ${ini} a ${fim} da estrutura — não gere as demais. Mantenha o "numero" global real de cada seção (de ${ini} a ${fim}).`;
+  const horaB = dados.horaBausente
+    ? `ATENÇÃO: a hora de nascimento de ${nomeB} não foi informada. Trate o Ascendente e as casas de ${nomeB} como não confirmados; priorize os aspectos de Sol, Lua, Vênus e Marte (estáveis independentemente da hora) e sinalize com elegância essa limitação onde for relevante.`
+    : "";
+
+  return `Você é uma astróloga brasileira mestre em Sinastria, com 30 anos de experiência em astrologia comparada e psicologia dos relacionamentos. Escreve em PORTUGUÊS DO BRASIL, com sofisticação e calor. Sua análise revela a DINÂMICA da relação — o que une E o que desafia, com igual profundidade — sem jamais julgar a relação como boa ou má, e sem jamais dizer "fuja" ou "não vai durar". NUNCA é determinista: use "tende a", "pode indicar". Você fala para AS DUAS pessoas, não só para quem pediu.
+
+TIPO DE RELAÇÃO (calibre todo o tom e o foco por isto): ${calibragem}
+${dados.estagio ? 'Estágio da relação: ' + dados.estagio : ''}
+${dados.questao ? 'Principal questão que querem entender: ' + dados.questao : ''}
+
+${MENSAGEM_CENTRAL}
+
+# OS DOIS MAPAS
+## ${nomeA}
+${mapaAInfo}
+
+## ${nomeB}
+${mapaBInfo}
+${horaB}
+
+# ASPECTOS ENTRE OS MAPAS
+Use APENAS estes. Cite o grau dos planetas e o orbe de cada aspecto, e correlacione os aspectos entre si.
+${aspectosInfo}
+
+${montarConhecimentoSinastria()}
+
+${ESTRUTURA_SINASTRIA}
+
+# REQUISITOS
+- Cite SEMPRE o grau dos planetas e o orbe de cada aspecto; correlacione os posicionamentos (ex.: a Vênus de ${nomeA} em tal grau tocando o Marte de ${nomeB} reforça/tensiona tal outra dinâmica).
+- Aspectos difíceis SEMPRE com caminho de crescimento. As sombras (Plutão, Netuno, Saturno) são nomeadas como dinâmica ancorada no aspecto real — NUNCA como rótulo clínico ("narcisista", "tóxico"), NUNCA com "fuja desta pessoa". Linguagem acolhedora, porém incisiva quando preciso.
+- Fale para AS DUAS pessoas. Tom de terapeuta de casais que conhece astrologia: honesto, jamais condenatório.
+- Aplique os 5 Atos como espinha narrativa e os 7 tipos para calibrar a síntese.
+- Empodere: relações evoluem, e a cada ciclo de consciência há a chance de reconstruir o vínculo em bases melhores.
+
+# ESCOPO DESTA GERAÇÃO
+${escopo}
+
+# FORMATO DE SAÍDA (OBRIGATÓRIO)
+Responda EXCLUSIVAMENTE com JSON válido, sem texto antes/depois, sem markdown:
+{ "secoes": [ { "numero": ${ini}, "titulo": "...", "texto": "..." } ] }
+REGRAS: aspas duplas; escape quebras como \\n e aspas internas como \\"; sem blocos de código; "numero" = número global real da seção; "texto" em PROSA corrida sofisticada (segunda pessoa, sem replicar bullets do template).
+
+# COMANDO FINAL
+Gere a Sinastria de ${nomeA} e ${nomeB}${parte !== "completo" ? " (" + parte + ", seções " + ini + "-" + fim + ")" : ""}. Nunca romantize, nunca condene. Mostre harmonia E desafio. Retorne apenas o JSON.`;
+}
+
+
 module.exports = {
   construirSinastria,
+  buildPromptSinastria,
+  montarConhecimentoSinastria,
+  TIPOS_SINASTRIA,
+  ESTRUTURA_SINASTRIA,
+  SECOES_POR_PARTE_SIN,
   MENSAGEM_CENTRAL,
   ENREDO_5_ATOS,
   LINGUAGEM_SOFISTICADA,
