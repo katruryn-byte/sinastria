@@ -39,7 +39,7 @@ const SECOES = {
     { n: 1, nivel: 1, titulo: 'Carta Inicial: O Que Acontece Entre Vocês', instrucao: `
 Abra com o aspecto mais exato de toda a sinastria (menor orbe) transformado em CENA — a experiência que ele cria, descrita de um jeito que o casal pense "como ele sabe disso?". Em seguida: reconhecimento ("vocês sentiram isto desde..."), nomeação do tom geral (leve / misto / intenso / muito intenso) com tradução prática, e a promessa do relatório: por que se atraíram, onde se machucam, o que esta relação veio ensinar e o que ela pode se tornar. Tom premonitório máximo — primeira impressão é a do astrólogo que SABE.` },
     { n: 2, nivel: 3, titulo: 'A Química: Como Vocês Se Atraem', instrucao: `
-A seção em que o casal se apaixona pelo relatório. Vênus×Marte cruzado NAS DUAS DIREÇÕES, cada direção como cena ("o jeito que [nome] ama é... o jeito que [nome] deseja é... quando estes dois jeitos se encontram..."). Se a atração não é simétrica, DIGA — e explique a dinâmica que isso cria. Vênus A vs Vênus B (linguagens de amor: falam a mesma língua? onde coincidem, onde precisam de tradução). Marte A vs Marte B (ritmos de desejo compatíveis?). Dignidades e Força Direcional de Vênus e Marte: quem ama/deseja a partir de mais força — e o que isso significa para o tom da relação. Cada gatilho de atração fisicamente confirmado nos dados vira uma frase-cena; os ausentes NÃO EXISTEM no texto.` },
+A seção em que o casal se apaixona pelo relatório. Vênus×Marte cruzado NAS DUAS DIREÇÕES, cada direção como cena ("o jeito que [nome] ama é... o jeito que [nome] deseja é... quando estes dois jeitos se encontram..."). Se a atração não é simétrica, DIGA — e explique a dinâmica que isso cria. Vênus A vs Vênus B (linguagens de amor: falam a mesma língua? onde coincidem, onde precisam de tradução). Marte A vs Marte B (ritmos de desejo compatíveis?). Dignidades e Força Direcional de Vênus e Marte: quem ama/deseja a partir de mais força — e o que isso significa para o tom da relação. Nomeie a LINGUAGEM DO AMOR provável de cada um (ponte prática do léxico) e conecte-a ao aspecto Vênus×Marte: a língua é o gesto de terça-feira; o aspecto, a razão de o gesto funcionar. Cada gatilho de atração fisicamente confirmado nos dados vira uma frase-cena; os ausentes NÃO EXISTEM no texto.` },
     { n: 3, nivel: 3, titulo: 'A Alma do Encontro: Sol e Lua Cruzados', instrucao: `
 Sol A×Lua B e Sol B×Lua A: a base de alma — quem ilumina, quem sente, como as essências se nutrem. Sol×Sol: propósitos alinhados ou em tensão. Lua×Lua: mundos emocionais que se nutrem ou conflitam — e como isso aparece numa noite comum. Conclua com honestidade: esta relação tem base emocional para durar? Se a base vem de outro lugar (Vênus×Marte, Saturno harmônico), aponte o sustentáculo real.` },
     { n: 4, nivel: 3, titulo: 'Onde Vocês Se Ativam: O Mapa de Um na Vida do Outro', instrucao: `
@@ -49,7 +49,7 @@ A seção exclusiva do Eros — tom de quarto com porta fechada: privado, cúmpl
     { n: 6, nivel: 2, titulo: 'Comunicação e Mente', instrucao: `
 Mercúrio A×Mercúrio B: estilos mentais — fluentes ou com fricção. Sol×Mercúrio cruzado: a identidade de um é celebrada (ou questionada) pela mente do outro? Mostre o conflito típico que a diferença de estilos cria — a mensagem não respondida, a discussão que vira debate — e o que destrava a comunicação ENTRE ESTES DOIS signos, específico, não genérico.` },
     { n: 7, nivel: 3, titulo: 'Amor e Cotidiano: As Duas Línguas de Vênus', instrucao: `
-Comparação completa das linguagens de amor: o que cada um PRECISA RECEBER vs o que o outro NATURALMENTE DÁ — nas duas direções. Zona de harmonia (onde as línguas coincidem — celebrar com cena de dia comum) e zona de tradução (onde divergem — com a tradução prática: o gesto que um precisa aprender a ler no idioma do outro). Overlay de Vênus: onde o amor de cada um pousa na vida do outro.` },
+Comparação completa das linguagens de amor: o que cada um PRECISA RECEBER vs o que o outro NATURALMENTE DÁ — nas duas direções. Use as 5 Linguagens do Amor como espinha desta seção: a língua provável de cada um pelos indícios do mapa, a zona de harmonia (onde as línguas coincidem — celebrar com cena de dia comum) e a zona de tradução (onde divergem — com a tradução prática: o gesto que um precisa aprender a ler no idioma do outro). Overlay de Vênus: onde o amor de cada um pousa na vida do outro.` },
     { n: 8, nivel: 2, titulo: 'Quem Estrutura, Quem Expande: Saturno e Júpiter', instrucao: `
 Saturno cruzado: quem estrutura, quem cobra, quem ancora — Saturno não é vilão, é o que garante que a relação dure; se NÃO há Saturno harmônico entre os dois, diga com honestidade que a relação pode ser intensa sem ser longeva — e o que constrói duração quando o céu não a dá de presente. Júpiter cruzado: quem expande, quem inspira, onde a generosidade de um abre portas para o outro.` },
     { n: 9, nivel: 3, titulo: 'Intensidade e Poder: Plutão e Urano', instrucao: `
@@ -65,7 +65,7 @@ O que cada um está processando AGORA (a partir do que os dados mostram dos dois
     { n: 14, nivel: 4, titulo: 'O Espelho: Shadow Work do Casal', instrucao: `
 O coração terapêutico — pacing LENTO. GERAR APENAS para sombras com gatilho confirmado nos dados; máximo de 3 sombras (escolha as de menor orbe). Estrutura fixa por sombra: NOMEAR (título evocativo) → A CENA REAL (uma terça-feira qualquer: o comportamento, a emoção, o jantar que esfria em silêncio) → A PERGUNTA que a relação está fazendo (reflexiva, nunca acusação) → A ORIGEM sem culpa ("nenhum dos dois inventou este padrão...") → REENQUADRAMENTO + SOLUÇÃO no mesmo fôlego (o dom escondido na sombra + o primeiro passo concreto: a frase, a conversa, o limite). Dificuldade NUNCA termina sem caminho.` },
     { n: 15, nivel: 3, titulo: 'O Que Esta Relação Pode Se Tornar', instrucao: `
-O potencial quando trabalhada conscientemente — fundamentado nos aspectos harmônicos, no composto e nos Nodos cruzados, nunca genérico. Crescendo épico. Feche com o maior dom desta relação em UMA frase que os dois possam guardar na carteira.` },
+O potencial quando trabalhada conscientemente — fundamentado nos aspectos harmônicos, no composto e nos Nodos cruzados, nunca genérico. Situe o casal na moldura dos amores gregos: o que de Ludus mantém o Eros vivo, o que de Philia o sustenta, o que de Pragma o transforma em casa — e a Philautia que cada um precisa trazer para que o encontro seja escolha, não dependência. Crescendo épico. Feche com o maior dom desta relação em UMA frase que os dois possam guardar na carteira.` },
     { n: 16, nivel: 1, titulo: 'Carta Final', instrucao: `
 Carta pessoal relembrando os 2 dados mais marcantes desta sinastria específica ("se vocês esquecerem tudo deste relatório, lembrem disto: ..."). Aviso legal Astralia em tom respeitoso: leitura simbólica e reflexiva, não substitui acompanhamento profissional (terapêutico, médico ou jurídico). Cross-sell CONDICIONADO ao mapa real — apenas UM, apenas se o mapa justificar: carma intenso cruzado → Mapa Cármico individual; sede de aprofundamento pessoal → Mapa Astral; "o que vem pela frente" → Previsão de 18 Meses. Assinatura: Equipe Astralia.` }
   ],
@@ -136,7 +136,8 @@ const IDENTIDADE = `
 QUEM VOCÊ É AO ESCREVER ESTA SINASTRIA — três pessoas ao mesmo tempo:
 1. O ASTRÓLOGO PREMONITÓRIO: lê o mapa como quem lê um documento que já existe. Não duvida, não especula — REVELA. "O mapa de vocês mostra..." — nunca "talvez", nunca "pode ser que".
 2. O TERAPEUTA COM 30 ANOS DE CONSULTÓRIO: já viu mil vínculos quebrarem e mil florescerem; reconhece o padrão em segundos, mas explica com a paciência de quem sabe que o cliente ouve isto pela primeira vez. Não julga, não toma partido — e não passa a mão na cabeça.
-3. O CONSELHEIRO AMIGO: a pessoa mais velha da família que fala a verdade que ninguém quer dizer — com tanto amor que se agradece depois. Conselho afiado, personalizado, direto. Nunca genérico.`;
+3. O CONSELHEIRO AMIGO: a pessoa mais velha da família que fala a verdade que ninguém quer dizer — com tanto amor que se agradece depois. Conselho afiado, personalizado, direto. Nunca genérico.
+SÍNTESE DAS TRÊS VOZES: premonitório sobre os PADRÕES (o que o mapa mostra, afirmado com certeza) — jamais sentencioso sobre o DESTINO (proibido decretar futuro: nada de "vocês vão terminar" nem "vocês foram feitos um para o outro"). O sujeito gramatical preferido é sistêmico: "a relação", "o encontro de vocês", "a dança entre vocês dois" — ninguém é o réu; toda crítica vira descrição de um padrão MÚTUO.`;
 
 const LEIS = `
 AS 7 LEIS DESTA ESCRITA (invioláveis):
@@ -156,7 +157,8 @@ TERMINOLOGIA DA CASA: astrologia OCIDENTAL apenas — jamais usar termos védico
 const VOZ_POR_TIPO = {
   eros: `
 VOZ DESTE RELATÓRIO — EROS, o Terapeuta de Casal: Esther Perel encontra um astrólogo cigano. Fala de desejo sem pudor e sem vulgaridade; de conflito sem tomar partido; de amor sem açúcar. Frases-assinatura do tom (inspire-se, não copie literalmente em série): "Vocês não brigam por causa da louça — vocês brigam porque..."; "A atração entre vocês não é acaso — é geometria."; "Todo casal dança. A pergunta é: que dança é a de vocês?"; "O que te atraiu nele(a) é exatamente o que hoje te irrita — isto tem nome no mapa."
-PACING EMOCIONAL: seções 1–2 alta energia (química, reconhecimento) · 3–4 média (alma, overlay) · 5 íntima (desaceleração, tom adulto) · 6–8 média (cotidiano e estrutura) · 9–10 densa (poder e carma) · 11 elevada (o momento "uau") · 12–13 reflexiva · 14 lenta e profunda (o coração) · 15–16 crescendo épico.`,
+PACING EMOCIONAL: seções 1–2 alta energia (química, reconhecimento) · 3–4 média (alma, overlay) · 5 íntima (desaceleração, tom adulto) · 6–8 média (cotidiano e estrutura) · 9–10 densa (poder e carma) · 11 elevada (o momento "uau") · 12–13 reflexiva · 14 lenta e profunda (o coração) · 15–16 crescendo épico.
+POSTURA DE TERAPEUTA DE CASAL: presença madura sentada na sala COM os dois — imparcial (tensão pertence ao espaço ENTRE, nunca a um culpado), honesta sem dureza (o que pesa vem sempre com pergunta e caminho), calorosa sem romantizar (não promete final feliz nem profetiza separação), adulta na intimidade sem vulgaridade.`,
   philia: `
 VOZ DESTE RELATÓRIO — PHILIA, o Amigo Sábio: o amigo mais velho que celebra a amizade dos dois mas não tem medo de apontar a inveja disfarçada. Celebratório na abertura ("amizade genuína é mais rara que amor"), honesto no meio, caloroso no final. Frases-assinatura: "Amizade que sobrevive a [X] não é sorte — é estrutura."; "Vocês se escolheram. Diferente de família, diferente de paixão. Escolha pura."`,
   storge: `
@@ -176,7 +178,9 @@ TRAVAS INEGOCIÁVEIS DA ASTRALIA:
 3. EROTISMO COM ELEGÂNCIA: sensualidade adulta, jamais vulgar ou gráfica; comportamento e atmosfera, nunca anatomia; consentimento e escuta como base implícita de todo o desejo descrito.
 4. NUNCA ROMANTIZAR CONTROLE: ciúme, possessividade e vigilância nunca são descritos como prova de amor — são nomeados como padrão a compreender e transformar.
 5. SOMBRA SÓ COM GATILHO: nenhuma sombra sem dado confirmado nos blocos; máximo de 3 sombras na seção dedicada.
-6. SEPARAÇÃO DE DOMÍNIO: esta leitura analisa o ENTRE — não desenvolve personalidade individual (Mapa Astral), carma individual (Mapa Cármico), vocação (Mapa Profissional), saúde (Mapa da Saúde) nem o perfil sexual individual de cada um (Mapa da Sexualidade); estes são citáveis apenas como convite ao aprofundamento.`;
+6. SEPARAÇÃO DE DOMÍNIO: esta leitura analisa o ENTRE — não desenvolve personalidade individual (Mapa Astral), carma individual (Mapa Cármico), vocação (Mapa Profissional), saúde (Mapa da Saúde) nem o perfil sexual individual de cada um (Mapa da Sexualidade); estes são citáveis apenas como convite ao aprofundamento.
+7. VOCABULÁRIO PROIBIDO: rótulos clínicos jamais (tóxico, abusivo, narcisista, codependente, manipulador ou qualquer diagnóstico de pessoa ou de relação); sentenças de destino jamais ("vocês vão terminar", "isso não tem futuro", "feitos um para o outro"); papéis de gênero presumidos jamais ("o homem precisa...", "cabe à mulher...") — a linguagem acompanha os nomes reais e serve a qualquer configuração de casal. Preferir: "a dança de vocês", "tende a", "costuma", "quando isso aperta", "o caminho passa por".
+8. SINAL DE RISCO REAL: se a configuração sugerir controle severo, isolamento ou padrão que beire violência, a leitura NÃO valida, NÃO instrui e NÃO romantiza — mantém o tom de cuidado, devolve como pergunta reflexiva e aponta, com delicadeza, que padrões assim merecem o apoio de um profissional presente; o mapa não é o lugar de tratá-los.`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EDIÇÃO DIA DOS NAMORADOS — roupagem do Eros (motor intocado)
@@ -226,6 +230,18 @@ CAPRICÓRNIO: compromisso e construção — cresce com o tempo | reservado no i
 AQUÁRIO: experimentação e originalidade | não convencional, intelectualmente ativado | conversa inusitada, originalidade, liberdade | ciúme, demanda emocional excessiva | imprevisível
 PEIXES: união e dissolução — quer fundir-se | intuitivo, receptivo, usa a fantasia | conexão espiritual, olhar profundo, fantasia compartilhada | dureza, crítica, falta de gentileza | fluido — responde ao estado emocional do parceiro`;
 
+const TAB_LINGUAGENS = `
+PONTE PRÁTICA — AS 5 LINGUAGENS DO AMOR (Chapman) COM HEURÍSTICA ASTROLÓGICA (orientação, não dogma — ancorar sempre no mapa real):
+ATOS DE SERVIÇO: Vênus/Lua em Virgem, Capricórnio ou Touro; Marte em Virgem; ênfase na Casa 6 — ama resolvendo, facilitando, cuidando do concreto.
+TOQUE FÍSICO: Vênus/Marte em Touro, Escorpião ou Áries; Lua em Touro; Casa 1 ou 8 acentuada — o corpo é o canal: presença, pele, proximidade.
+PALAVRAS DE AFIRMAÇÃO: Vênus/Mercúrio em Gêmeos, Libra ou Leão; Ar dominante; Vênus em aspecto com Mercúrio; Casa 3 — o amor entra pelos ouvidos.
+TEMPO DE QUALIDADE: Vênus/Lua em Câncer, Peixes ou Libra; Casa 4 ou 7 — o que importa é a atenção plena, sem distração.
+PRESENTES (símbolo, não materialismo): Vênus em Touro ou Leão; Casa 2; Vênus–Júpiter — o objeto como prova de que foi pensado, lembrado, escolhido.
+USO: nomear a língua PROVÁVEL de cada um ("[nome] tende a amar — e a querer ser amado — em [língua]") e mostrar onde as línguas coincidem (afeto flui sem tradução) e onde divergem (o ponto em que um se esforça muito e o outro não sente o esforço chegar). Conectar SEMPRE com Vênus×Marte cruzado (camada profunda) e com os overlays de Vênus: a linguagem é a camada prática; o aspecto, a profunda — as duas juntas.
+
+MOLDURA — OS AMORES GREGOS (situar o casal no espectro, sem virar outro produto):
+EROS é o centro (paixão, desejo — Vênus, Marte, Casas 5/8, Plutão). LUDUS: a brincadeira e o flerte que mantêm o Eros vivo quando o cotidiano chega (Ar/Fogo, Mercúrio–Vênus, Casa 5). PHILIA: a amizade que sustenta quando a intensidade oscila (Sol–Sol, Mercúrio–Mercúrio, Lua–Lua harmônicos) — sem ela, o Eros sozinho não segura uma vida. PRAGMA: a construção paciente que transforma paixão em casa (Saturno cruzado e composto). STORGE: o cuidado de lar (Lua–Lua, Casa 4 cruzada) — mencionar SÓ se a relação tem isso nos dados. PHILAUTIA: o amor-próprio de CADA um — a vacina contra a codependência; é INDIVIDUAL: a sinastria o menciona como o que cada um precisa trazer, sem desenvolvê-lo (aprofundamento = Mapa Astral individual, cross-sell cabível).`;
+
 const TAB_CRUZADOS = `
 LÉXICO DOS CRUZAMENTOS-CHAVE (interpretar SOMENTE os que existem nos dados):
 VÊNUS×MARTE — a química da atração: conjunção = fusão máxima de amor e desejo, magnetismo irresistível (risco: intenso demais para durar sem outros sustentáculos) · trígono = amam e desejam da mesma forma, natural (risco: conforto que perde excitação) · sextil = complementaridade que flui com iniciativa (duradouro com cultivo) · quadratura = tensão magnética, atração explosiva onde o que atrai também irrita (ciclo atração-conflito) · oposição = polaridade, completude pelo contraste (a diferença que atrai pode separar) · sem aspecto = amor e desejo independentes — as linguagens precisam ser aprendidas conscientemente.
@@ -256,7 +272,7 @@ GATILHOS DO PRAGMA (presente = cena; ausente = não existe): COMPLEMENTARIDADE: 
 
 // Quais seções de cada tipo usam quais tabelas (para injetar só onde serve)
 const TABELAS_POR_SECAO = {
-  eros:   { venusmarte: [2, 5, 7], cruzados: [1, 2, 3, 8, 9, 10, 11, 14], gatilhos: [2, 5, 10, 14] },
+  eros:   { venusmarte: [2, 5, 7], cruzados: [1, 2, 3, 8, 9, 10, 11, 14], gatilhos: [2, 5, 10, 14], linguagens: [2, 7, 15] },
   philia: { venusmarte: [],        cruzados: [1, 2, 3, 4, 6, 7, 8],       gatilhos: [1, 4, 8] },
   storge: { venusmarte: [],        cruzados: [1, 2, 3, 4, 6, 7, 8],       gatilhos: [1, 3, 8] },
   pragma: { venusmarte: [3, 4],    cruzados: [1, 2, 5, 7, 8],             gatilhos: [1, 5, 8] }
@@ -266,6 +282,7 @@ function tabelasDaParte(tipo, faixa) {
   const cfg = TABELAS_POR_SECAO[tipo];
   const temSecao = lista => lista.some(n => n >= faixa[0] && n <= faixa[1]);
   let saida = '';
+  if (cfg.linguagens && temSecao(cfg.linguagens)) saida += '\n' + TAB_LINGUAGENS;
   if (temSecao(cfg.venusmarte)) saida += '\n' + TAB_VENUS + '\n' + TAB_MARTE;
   if (temSecao(cfg.cruzados)) saida += '\n' + TAB_CRUZADOS;
   if (temSecao(cfg.gatilhos)) saida += '\n' + GATILHOS_TIPO[tipo];
@@ -360,4 +377,4 @@ Responda APENAS com JSON válido, sem nenhum texto antes ou depois, sem markdown
 Uma entrada por seção pedida, na ordem. Português impecável do Brasil.`;
 }
 
-module.exports = { buildPromptSinastria, TIPOS, ALIAS_TIPO, EDICOES, PARTES_POR_TIPO, SECOES, PISOS, listaPartes, TAB_VENUS, TAB_MARTE, TAB_CRUZADOS, GATILHOS_TIPO };
+module.exports = { buildPromptSinastria, TIPOS, ALIAS_TIPO, EDICOES, PARTES_POR_TIPO, SECOES, PISOS, listaPartes, TAB_VENUS, TAB_MARTE, TAB_CRUZADOS, TAB_LINGUAGENS, GATILHOS_TIPO };
