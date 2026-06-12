@@ -5,40 +5,59 @@ const { registrarCompra } = require('./cliente');
 const PRODUTO_ID = 'sinastria';
 
 // ── Registro no Google Sheets (SheetDB) — DUAS linhas por compra ──
-// A Sinastria envolve duas pessoas; a planilha recebe uma linha para cada,
-// nas MESMAS colunas já usadas pelo restante da Astralia.
-// Regra contábil: o Valor entra SÓ na linha da Pessoa 1, para a soma da
-// planilha refletir a receita real (a linha 2 vai com 0.00).
-// Fire-and-forget: falha no Sheets NUNCA derruba a entrega.
-function registrarNoSheets(dados, codigoCliente, preco, recorrente) {
+// Colunas da planilha real: Data, Nome, WhatsApp, Email, Cidade, Nascimento, Hora,
+// Tipo, Valor, Codigo Cliente, Genero, Cliente Recorrente, Lat, Lon, Timezone, CPF,
+// Status Pagamento, Payment ID MP, Sessao ID, PDF Drive URL, Email Enviado Em, Status Entrega.
+// Regras: Valor e CPF só na linha da Pessoa 1 (soma da planilha e privacidade);
+// Email Enviado Em / Status Entrega são carimbados DEPOIS, pelo worker, na entrega.
+// Fire-and-forget: falha no Sheets NUNCA derruba a esteira.
+function registrarNoSheets(dados, codigoCliente, preco, recorrente, sessionId, paymentId) {
   try {
     if (!process.env.SHEETDB_URL) return;
     const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' });
     const tipoBase = 'sinastria-' + (dados.tipo || 'eros') + (dados.edicao ? '-' + dados.edicao : '');
     const flagRecorrente = recorrente ? 'Sim' : 'Não';
 
-    const linhaDe = (p, papel, valor) => ({
+    let tzDe = () => '';
+    try {
+      const { getTimezoneCoord } = require('./timezone-coord');
+      tzDe = (p) => {
+        try { return (p && p.lat && p.lon) ? String(getTimezoneCoord(p.lat, p.lon, p.data, p.hora)) : ''; }
+        catch (e) { return ''; }
+      };
+    } catch (e) {}
+
+    const linhaDe = (p, papel, valor, cpf) => ({
       Data: agora,
-      'Codigo Cliente': codigoCliente || '',
       Nome: (p && p.nome) || dados.nome || '',
       WhatsApp: dados.whatsapp || '',
       Email: dados.email || '',
       Cidade: (p && p.cidade) || '',
       Nascimento: (p && p.data) || '',
       Hora: (p && p.hora) || '',
-      Genero: dados.genero || '',
       Tipo: tipoBase + ' · ' + papel,
       Valor: valor,
-      'Cliente Recorrente': flagRecorrente
+      'Codigo Cliente': codigoCliente || '',
+      Genero: dados.genero || '',
+      'Cliente Recorrente': flagRecorrente,
+      Lat: (p && p.lat) || '',
+      Lon: (p && p.lon) || '',
+      Timezone: tzDe(p),
+      CPF: cpf || '',
+      'Status Pagamento': 'approved',
+      'Payment ID MP': paymentId ? String(paymentId) : '',
+      'Sessao ID': sessionId || '',
+      'PDF Drive URL': '',
+      'Email Enviado Em': '',
+      'Status Entrega': 'em produção'
     });
 
     const linhas = [];
     if (dados.pessoaA) {
-      linhas.push(linhaDe(dados.pessoaA, 'Pessoa 1', Number(preco || 0).toFixed(2)));
-      if (dados.pessoaB) linhas.push(linhaDe(dados.pessoaB, 'Pessoa 2', '0.00'));
+      linhas.push(linhaDe(dados.pessoaA, 'Pessoa 1', Number(preco || 0).toFixed(2), dados.cpf || ''));
+      if (dados.pessoaB) linhas.push(linhaDe(dados.pessoaB, 'Pessoa 2', '0.00', ''));
     } else {
-      // Fallback: payload antigo de uma pessoa só (robustez)
-      linhas.push(linhaDe(dados, 'Pessoa 1', Number(preco || 0).toFixed(2)));
+      linhas.push(linhaDe(dados, 'Pessoa 1', Number(preco || 0).toFixed(2), dados.cpf || ''));
     }
 
     fetch(process.env.SHEETDB_URL, {
@@ -85,7 +104,7 @@ async function processarAprovacao(sessionId, paymentId, redisUrl) {
       sessionObj.novoCliente = reg.novoCliente;
 
       // Ponte com o Google Sheets: duas linhas (Pessoa 1 e Pessoa 2)
-      registrarNoSheets(sessionObj.dados, reg.codigo, sessionObj.preco, !reg.novoCliente);
+      registrarNoSheets(sessionObj.dados, reg.codigo, sessionObj.preco, !reg.novoCliente, sessionId, paymentId);
     } catch (e) { console.error('Erro ao registrar cliente:', e.message); }
   }
 
