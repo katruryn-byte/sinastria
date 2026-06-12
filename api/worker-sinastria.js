@@ -255,7 +255,7 @@ module.exports = async function handler(req, res) {
           const j = JSON.parse(raw);
           job = {
             sessionId: j.sessionId, tipo: j.tipo, status: j.status,
-            partes: j.partes.map(p => ({ parte: p.parte, feito: p.feito, tentativas: p.tentativas })),
+            partes: j.partes.map(p => ({ parte: p.parte, feito: p.feito, tentativas: p.tentativas, ultimoErro: p.ultimoErro || null })),
             secoes_acumuladas: (j.secoes || []).length
           };
         }
@@ -267,9 +267,24 @@ module.exports = async function handler(req, res) {
     // ── Modo verErros: lê a fila de erros (diagnóstico) ──
     // ?teste=ADMIN_SECRET&verErros=1
     if (ehTeste && req.query.verErros) {
-      const erros = await redis.lRange('sinastria:erro', 0, 9);
+      const brutos = await redis.lRange('sinastria:erro', 0, 9);
+      const erros = [];
+      for (const e of brutos) {
+        let reg; try { reg = JSON.parse(e); } catch (x) { reg = { sessionId: e }; }
+        if (!reg.motivo && reg.sessionId) {
+          const rawJ = await redis.get('sinastria:job:' + reg.sessionId);
+          if (rawJ) {
+            try {
+              const j = JSON.parse(rawJ);
+              const pErr = (j.partes || []).find(p => p.ultimoErro);
+              if (pErr) { reg.parte = pErr.parte; reg.motivo = pErr.ultimoErro; }
+            } catch (x) {}
+          }
+        }
+        erros.push(reg);
+      }
       await redis.quit();
-      return res.status(200).json({ status: 'erros', total: erros.length, erros: erros.map(e => { try { return JSON.parse(e); } catch (x) { return e; } }) });
+      return res.status(200).json({ status: 'erros', total: erros.length, erros });
     }
 
     // ── Modo limparErros: esvazia a fila de erros após o conserto ──
@@ -361,7 +376,7 @@ module.exports = async function handler(req, res) {
         const tipoBruto = (PROMPT.ALIAS_TIPO && PROMPT.ALIAS_TIPO[d.tipo]) || d.tipo;
         const tipo = (tipoBruto && PROMPT.TIPOS.includes(tipoBruto)) ? tipoBruto : 'eros';
         if (!d.pessoaA || !d.pessoaB || !d.pessoaA.data || !d.pessoaB.data) {
-          await redis.lPush('sinastria:erro', compra.sessionId || 'sem-id');
+          await redis.lPush('sinastria:erro', JSON.stringify({ sessionId: compra.sessionId || 'sem-id', motivo: 'dados_invalidos: pessoaA/pessoaB incompletos' }));
           return res.status(200).json({ status: 'dados_invalidos', sessionId: compra.sessionId });
         }
 
@@ -425,7 +440,7 @@ module.exports = async function handler(req, res) {
         if (pendente.tentativas >= MAX_TENTATIVAS) {
           job.status = 'erro';
           await salvarJob(redis, job);
-          await redis.lPush('sinastria:erro', sessionId);
+          await redis.lPush('sinastria:erro', JSON.stringify({ sessionId, parte: pendente.parte, motivo: pendente.ultimoErro || 'tentativas esgotadas' }));
           await redis.del('sinastria:ativo');
           return res.status(200).json({ status: 'erro_definitivo', sessionId, parte: pendente.parte });
         }
