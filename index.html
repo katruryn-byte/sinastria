@@ -513,7 +513,7 @@ function iniciarPolling(){
     const ps=document.getElementById('polling-status'); if(ps) ps.textContent=`Verificando... (${tentativas}/60)`;
     if(tentativas>60){ clearInterval(pollingInterval); return; }
     try{ const r=await fetch(`/api/check?sessionId=${sessionId}`); const d=await r.json();
-      if(d.status==='approved'){ clearInterval(pollingInterval);
+      if(['approved','pago_aguardando_geracao','em_geracao','gerado','gerado_aguardando_montagem','entregue'].includes(d.status)){ clearInterval(pollingInterval);
         document.getElementById('pix-section').style.display='none';
         document.getElementById('aguardando-box').style.display='none';
         document.getElementById('sucesso-box').style.display='block';
