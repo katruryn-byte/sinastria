@@ -82,7 +82,12 @@ async function chamarClaude(prompt, maxTokens, tentativas = 4) {
       })
     });
     if (res.status === 429 || res.status === 529) { await sleep(2000 * (i + 1)); continue; }
-    try { return await res.json(); } catch (e) { return null; }
+    const corpo = await res.text();
+    let data = null; try { data = JSON.parse(corpo); } catch (e) {}
+    // Erro da API NUNCA é engolido: vira mensagem visível no diagnóstico
+    if (!res.ok) return { __erro: 'API Anthropic HTTP ' + res.status + ' — ' + corpo.slice(0, 200) };
+    if (data && data.type === 'error') return { __erro: 'API Anthropic: ' + ((data.error && data.error.message) || corpo.slice(0, 200)) };
+    return data;
   }
   return null;
 }
@@ -428,6 +433,8 @@ module.exports = async function handler(req, res) {
       // ── Gera UMA parte ──
       const prompt = PROMPT.buildPromptSinastria(job.casal, job.blocos, job.tipo, pendente.parte, job.edicao || null);
       const resp = await chamarClaude(prompt, MAX_TOKENS);
+      if (!resp) throw new Error('Claude sem resposta (rede/timeout após retries)');
+      if (resp.__erro) throw new Error(resp.__erro);
       const texto = resp && resp.content && resp.content[0] && resp.content[0].text;
       const json = extrairJSON(texto);
       const secoes = json && Array.isArray(json.secoes)
