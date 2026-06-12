@@ -218,6 +218,21 @@ async function atualizarSessao(redis, sessionId, patch) {
   } catch (e) { console.warn('[worker-sinastria] sessão não atualizada:', e.message); }
 }
 
+// Carimba a entrega na planilha (SheetDB): localiza as linhas pela Sessao ID
+// e atualiza Status Entrega + Email Enviado Em. Atualiza as DUAS linhas do casal.
+async function carimbarEntregaSheets(sessionId) {
+  try {
+    if (!process.env.SHEETDB_URL || !sessionId) return;
+    const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' });
+    const url = process.env.SHEETDB_URL.replace(/\/$/, '') + '/' + encodeURIComponent('Sessao ID') + '/' + encodeURIComponent(sessionId);
+    await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: { 'Status Entrega': 'entregue', 'Email Enviado Em': agora } })
+    });
+  } catch (e) { console.log('SheetDB carimbo:', e.message); }
+}
+
 module.exports = async function handler(req, res) {
   const redisUrl = process.env.REDIS_URL || process.env.STORAGE_URL;
   const ehTeste = req.query && req.query.teste === process.env.ADMIN_SECRET;
@@ -371,6 +386,7 @@ module.exports = async function handler(req, res) {
         }
         const envio = await enviarEmailSinastria(job, pdf);
         job.status = 'entregue';
+      await carimbarEntregaSheets(job.sessionId);
         job.entrega = { em: new Date().toISOString(), para: job.email, envio };
         await salvarJob(redis, job);
         await atualizarSessao(redis, sessionId, { status: 'gerado', entregueEm: job.entrega.em });
