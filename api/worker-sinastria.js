@@ -223,19 +223,20 @@ async function atualizarSessao(redis, sessionId, patch) {
   } catch (e) { console.warn('[worker-sinastria] sessão não atualizada:', e.message); }
 }
 
-// Carimba a entrega na planilha (SheetDB): localiza as linhas pela Sessao ID
-// e atualiza Status Entrega + Email Enviado Em. Atualiza as DUAS linhas do casal.
+// Carimba a entrega na planilha (Apps Script): upsert por "Sessao ID",
+// nas duas chaves do casal (sid e sid-B). Só toca nos campos enviados.
 async function carimbarEntregaSheets(sessionId) {
   try {
-    if (!process.env.SHEETDB_URL || !sessionId) return;
+    if (!process.env.APPS_SCRIPT_URL || !sessionId) return;
     const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' });
-    const url = process.env.SHEETDB_URL.replace(/\/$/, '') + '/' + encodeURIComponent('Sessao ID') + '/' + encodeURIComponent(sessionId);
-    await fetch(url, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: { 'Status Entrega': 'entregue', 'Email Enviado Em': agora } })
-    });
-  } catch (e) { console.log('SheetDB carimbo:', e.message); }
+    for (const chave of [sessionId, sessionId + '-B']) {
+      await fetch(process.env.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 'Sessao ID': chave, 'Status Entrega': 'entregue', 'Email Enviado Em': agora })
+      });
+    }
+  } catch (e) { console.log('Sheets carimbo:', e.message); }
 }
 
 module.exports = async function handler(req, res) {
@@ -267,6 +268,54 @@ module.exports = async function handler(req, res) {
       }
       await redis.quit();
       return res.status(200).json({ status: 'relatorio', fila_sinastria: fila, erros: erro, ativo, lock_ocupado: !!lock, job });
+    }
+
+    // ── Sonda da ponte com a planilha: GET no Apps Script ──
+    // ?teste=ADMIN_SECRET&sheets=1
+    if (ehTeste && req.query.sheets) {
+      if (!process.env.APPS_SCRIPT_URL) { await redis.quit(); return res.status(200).json({ status: 'sem_APPS_SCRIPT_URL' }); }
+      try {
+        const r = await fetch(process.env.APPS_SCRIPT_URL);
+        const corpo = await r.text();
+        await redis.quit();
+        return res.status(200).json({ status: 'ponte', http: r.status, resposta: corpo.slice(0, 300) });
+      } catch (e) { await redis.quit(); return res.status(200).json({ status: 'ponte_falhou', erro: e.message }); }
+    }
+
+    // ── Resgate retroativo: grava na planilha uma compra que o webhook perdeu ──
+    // ?teste=ADMIN_SECRET&registrarSheets={sessionId}
+    if (ehTeste && req.query.registrarSheets) {
+      const sid = String(req.query.registrarSheets);
+      const raw = await redis.get('session:' + sid);
+      if (!raw) { await redis.quit(); return res.status(404).json({ error: 'sessão não encontrada' }); }
+      if (!process.env.APPS_SCRIPT_URL) { await redis.quit(); return res.status(200).json({ status: 'sem_APPS_SCRIPT_URL' }); }
+      const s = JSON.parse(raw);
+      const d = s.dados || {};
+      const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' });
+      let tzDe = () => '';
+      try {
+        const { getTimezoneCoord } = require('./timezone-coord');
+        tzDe = (p) => { try { return (p && p.lat && p.lon) ? String(getTimezoneCoord(p.lat, p.lon, p.data, p.hora)) : ''; } catch (e) { return ''; } };
+      } catch (e) {}
+      const tipoBase = 'sinastria-' + (d.tipo || 'eros') + (d.edicao ? '-' + d.edicao : '');
+      const linhaDe = (p, papel, valor, cpf, chave) => ({
+        'Data': agora, 'Nome': (p && p.nome) || d.nome || '', 'WhatsApp': d.whatsapp || '', 'Email': d.email || '',
+        'Cidade': (p && p.cidade) || '', 'Nascimento': (p && p.data) || '', 'Hora': (p && p.hora) || '',
+        'Tipo': tipoBase + ' · ' + papel, 'Valor': valor, 'Codigo Cliente': d.codigoCliente || '',
+        'Genero': d.genero || '', 'Cliente Recorrente': '', 'Lat': (p && p.lat) || '', 'Lon': (p && p.lon) || '',
+        'Timezone': tzDe(p), 'CPF': cpf || '', 'Status Pagamento': s.status === 'pending' ? 'pending' : 'approved',
+        'Payment ID MP': s.paymentId ? String(s.paymentId) : '', 'Sessao ID': chave,
+        'Status Entrega': s.status === 'entregue' ? 'entregue' : 'em produção'
+      });
+      const linhas = [linhaDe(d.pessoaA || d, 'Pessoa 1', Number(s.preco || 0).toFixed(2), d.cpf || '', sid)];
+      if (d.pessoaB) linhas.push(linhaDe(d.pessoaB, 'Pessoa 2', '', '', sid + '-B'));
+      const respostas = [];
+      for (const linha of linhas) {
+        const r = await fetch(process.env.APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(linha) });
+        respostas.push({ http: r.status, corpo: (await r.text()).slice(0, 120) });
+      }
+      await redis.quit();
+      return res.status(200).json({ status: 'registrado', sessionId: sid, linhas: linhas.length, respostas });
     }
 
     // ── Modo verErros: lê a fila de erros (diagnóstico) ──
