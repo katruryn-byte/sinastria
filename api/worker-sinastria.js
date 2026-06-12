@@ -139,9 +139,61 @@ function escaparHtml(s) {
 function paragrafos(conteudo) {
   return String(conteudo || '').split(/\n\s*\n/).map(p => '<p>' + escaparHtml(p.trim()).replace(/\n/g, '<br>') + '</p>').join('\n');
 }
+// ── FOLHA DE DADOS ASTROLÓGICOS ──
+// Tabelas determinísticas, direto do cálculo (FreeAstrology + núcleo matemático):
+// posições das duas pessoas, aspectos cruzados por orbe e o mapa composto (midpoints).
+function gerarFolhaDadosHTML(resultado, nomeA, nomeB) {
+  const esc = escaparHtml;
+  const gm = (g) => { let gi = Math.floor(g); let m = Math.round((g - gi) * 60); if (m === 60) { gi += 1; m = 0; } return gi + '\u00b0' + (m < 10 ? '0' + m : m) + '\u2032'; };
+
+  const tabelaPontos = (pontos, nome) => `
+    <table class="dados">
+      <caption>${esc(nome)}</caption>
+      <thead><tr><th>Ponto</th><th>Signo</th><th>Grau</th><th>Casa</th><th></th></tr></thead>
+      <tbody>${(pontos || []).map(p => `
+        <tr><td>${esc(p.nome)}</td><td>${esc(p.signo)}</td><td>${gm(p.grauNoSigno)}</td><td>${p.casaNum ? 'Casa ' + p.casaNum : '—'}</td><td>${p.retro ? '\u211e' : ''}</td></tr>`).join('')}
+      </tbody>
+    </table>`;
+
+  const tabelaAspectos = (cruzados) => `
+    <table class="dados">
+      <caption>Aspectos entre os dois mapas — do mais exato ao mais largo</caption>
+      <thead><tr><th>${esc(nomeA)}</th><th>Aspecto</th><th>${esc(nomeB)}</th><th>Orbe</th><th>Natureza</th></tr></thead>
+      <tbody>${(cruzados || []).slice(0, 20).map(a => `
+        <tr><td>${esc(a.de)} (${esc(a.signoDe)})</td><td>${esc(a.aspecto)}</td><td>${esc(a.para)} (${esc(a.signoPara)})</td><td>${esc(String(a.orbe))}\u00b0</td><td>${esc(a.natureza)}</td></tr>`).join('')}
+      </tbody>
+    </table>`;
+
+  const comp = resultado.composto || {};
+  const tabelaComposto = `
+    <table class="dados">
+      <caption>O Mapa de Vocês Dois — composto por ponto médio</caption>
+      <thead><tr><th>Ponto composto</th><th>Signo</th><th>Grau</th><th>Casa</th></tr></thead>
+      <tbody>
+        ${comp.ascendente ? `<tr><td>Ascendente</td><td>${esc(comp.ascendente.nome)}</td><td>${gm(comp.ascendente.grauNoSigno)}</td><td>—</td></tr>` : ''}
+        ${(comp.planetas || []).map(p => `
+        <tr><td>${esc(p.nome)}</td><td>${esc(p.signo)}</td><td>${gm(p.grauNoSigno)}</td><td>${p.casa ? 'Casa ' + p.casa : '—'}</td></tr>`).join('')}
+      </tbody>
+    </table>`;
+
+  const c = resultado.contagem || {};
+  const resumo = `<p class="resumo-dados">${c.harmonicos ?? '—'} aspectos harm\u00f4nicos \u00b7 ${c.tensos ?? '—'} tensos \u00b7 ${c.conjuncoes ?? '—'} fus\u00f5es \u2014 tom geral: <b>${esc(c.tom || '')}</b></p>`;
+
+  return `
+  <section class="folha-dados">
+    <h2>A Geometria do Encontro <span class="sub-h2">os dados desta leitura</span></h2>
+    ${resumo}
+    <div class="duas-colunas">${tabelaPontos(resultado.pontosA, nomeA)}${tabelaPontos(resultado.pontosB, nomeB)}</div>
+    ${tabelaAspectos(resultado.cruzados)}
+    ${tabelaComposto}
+    <p class="nota-dados">Toda a leitura que segue est\u00e1 ancorada nestes pontos \u2014 graus, casas e orbes calculados para o instante e o lugar exatos do nascimento de cada um.</p>
+  </section>`;
+}
+
 function montarHtmlSinastria(job) {
   const rotulo = ROTULO_TIPO[job.tipo] || 'Sinastria';
   const dataStr = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const selo = job.edicao === 'namorados' ? 'Edi\u00e7\u00e3o Dia dos Namorados' : 'Leitura a Dois';
   const corpo = (job.secoes || []).map(s => `
     <section class="secao">
       <h2>${escaparHtml(s.titulo)}</h2>
@@ -150,31 +202,72 @@ function montarHtmlSinastria(job) {
 
   return `<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <style>
-  @page { margin: 2.2cm 1.9cm; }
-  body { font-family: Georgia, 'Times New Roman', serif; color: #2b1320; font-size: 12.5pt; line-height: 1.75; }
-  .capa { text-align: center; page-break-after: always; padding-top: 5cm; }
-  .capa .marca { font-size: 13pt; letter-spacing: 0.55em; color: #b8860b; text-transform: uppercase; }
-  .capa h1 { font-size: 30pt; color: #7a1632; margin: 0.6em 0 0.2em; font-weight: normal; letter-spacing: 0.04em; }
-  .capa .nomes { font-size: 19pt; color: #2b1320; margin-top: 1.4em; }
-  .capa .e { color: #b8860b; font-style: italic; font-size: 14pt; margin: 0.3em 0; }
-  .capa .data { margin-top: 3.2em; font-size: 10.5pt; color: #8a6d3b; letter-spacing: 0.18em; text-transform: uppercase; }
-  .filete { width: 130px; height: 1px; background: #b8860b; margin: 1.6em auto; }
-  h2 { color: #7a1632; font-size: 17pt; font-weight: normal; margin: 1.8em 0 0.5em; padding-bottom: 0.25em; border-bottom: 1px solid #d9b86a; page-break-after: avoid; }
-  p { margin: 0 0 0.85em; text-align: justify; }
-  .secao { page-break-inside: auto; }
-  .rodape { margin-top: 3em; text-align: center; font-size: 9.5pt; color: #8a6d3b; letter-spacing: 0.2em; }
+  :root{ --creme:#faf6ee; --papel:#fdfbf5; --vinho:#6d1430; --vinho-claro:#9a3553; --ouro:#b8860b; --ouro-claro:#c9a14d; --tinta:#2b1a22; --suave:#7d6a72; --linha:#e3d3b8; }
+  @page { margin: 0; }
+  body { margin:0; font-family:'Cormorant Garamond', Georgia, serif; color:var(--tinta); font-size:13pt; line-height:1.8; background:var(--papel); }
+
+  /* ── CAPA ── */
+  .capa{ height:297mm; width:210mm; position:relative; background:var(--creme); page-break-after:always; }
+  .capa .moldura{ position:absolute; top:12mm; left:12mm; right:12mm; bottom:12mm; border:0.6pt solid var(--ouro); }
+  .capa .moldura:before{ content:""; position:absolute; top:3mm; left:3mm; right:3mm; bottom:3mm; border:0.4pt solid var(--linha); }
+  .capa-top{ position:absolute; top:34mm; left:0; right:0; text-align:center; }
+  .capa-sel{ font-family:'Cinzel'; font-size:10.5pt; letter-spacing:5px; color:var(--ouro); text-transform:uppercase; }
+  .capa-titulo{ font-family:'Cinzel'; font-weight:600; color:var(--vinho); font-size:34pt; letter-spacing:2px; line-height:1.1; margin-top:8mm; }
+  .capa-emblema{ position:absolute; top:120mm; left:0; right:0; text-align:center; font-size:26pt; color:var(--ouro-claro); letter-spacing:14px; }
+  .capa-nomes{ position:absolute; top:158mm; left:0; right:0; text-align:center; }
+  .capa-nomes .nome{ font-family:'Cinzel'; font-size:21pt; color:var(--vinho); font-weight:600; letter-spacing:1px; }
+  .capa-nomes .e{ font-size:14pt; color:var(--ouro); font-style:italic; margin:3mm 0; }
+  .capa-data{ position:absolute; top:215mm; left:0; right:0; text-align:center; font-size:10.5pt; color:var(--suave); letter-spacing:3px; text-transform:uppercase; }
+  .capa-marca{ position:absolute; bottom:24mm; left:0; right:0; text-align:center; }
+  .capa-marca .nome{ font-family:'Cinzel'; font-size:14pt; letter-spacing:8px; color:var(--vinho); font-weight:600; }
+  .capa-marca .filete{ width:40mm; height:0.5pt; background:var(--ouro); margin:3mm auto 0; }
+
+  /* ── MIOLO ── */
+  .miolo{ padding: 20mm 19mm; }
+  h2{ font-family:'Cinzel'; color:var(--vinho); font-size:16.5pt; font-weight:600; letter-spacing:0.5px; margin:2em 0 0.6em; padding-bottom:0.3em; border-bottom:0.7pt solid var(--ouro-claro); page-break-after:avoid; }
+  h2:before{ content:"\u2726"; color:var(--ouro); margin-right:0.45em; font-size:12pt; }
+  .sub-h2{ display:block; font-family:'Cormorant Garamond'; font-size:11pt; font-style:italic; font-weight:400; color:var(--suave); letter-spacing:1px; margin-top:2mm; text-transform:lowercase; }
+  p{ margin:0 0 0.9em; text-align:justify; }
+  .secao{ page-break-inside:auto; }
+  .secao > p:first-of-type:first-letter{ font-family:'Cinzel'; font-size:26pt; color:var(--vinho); padding-right:2pt; }
+
+  /* ── FOLHA DE DADOS ── */
+  .folha-dados{ page-break-before:always; page-break-after:always; }
+  .resumo-dados{ text-align:center; font-style:italic; color:var(--vinho-claro); font-size:12.5pt; margin:0.4em 0 1.2em; }
+  .duas-colunas{ display:flex; gap:6mm; }
+  .duas-colunas table{ flex:1; }
+  table.dados{ width:100%; border-collapse:collapse; margin:0 0 1.4em; font-size:10.5pt; }
+  table.dados caption{ font-family:'Cinzel'; font-size:11pt; color:var(--vinho); letter-spacing:1px; padding-bottom:2mm; caption-side:top; }
+  table.dados th{ font-family:'Cinzel'; font-weight:600; font-size:9pt; letter-spacing:0.5px; color:var(--ouro); text-transform:uppercase; border-bottom:0.8pt solid var(--ouro-claro); padding:1.5mm 2mm; text-align:left; }
+  table.dados td{ border-bottom:0.4pt solid var(--linha); padding:1.4mm 2mm; }
+  table.dados tr:nth-child(even) td{ background:rgba(201,161,77,0.06); }
+  .nota-dados{ font-size:10.5pt; font-style:italic; color:var(--suave); text-align:center; margin-top:1em; }
+
+  .rodape{ margin-top:3em; text-align:center; font-family:'Cinzel'; font-size:9.5pt; color:var(--ouro); letter-spacing:4px; }
 </style></head>
 <body>
   <div class="capa">
-    <div class="marca">Astralia</div>
-    <div class="filete"></div>
-    <h1>${escaparHtml(rotulo)}</h1>
-    <div class="nomes">${escaparHtml(job.casal.nomeA)}<div class="e">&amp;</div>${escaparHtml(job.casal.nomeB)}</div>
-    <div class="data">${dataStr}</div>
+    <div class="moldura"></div>
+    <div class="capa-top">
+      <div class="capa-sel">${escaparHtml(selo)}</div>
+      <div class="capa-titulo">${escaparHtml(rotulo)}</div>
+    </div>
+    <div class="capa-emblema">\u2726 \u2764 \u2726</div>
+    <div class="capa-nomes">
+      <div class="nome">${escaparHtml(job.casal.nomeA)}</div>
+      <div class="e">&amp;</div>
+      <div class="nome">${escaparHtml(job.casal.nomeB)}</div>
+    </div>
+    <div class="capa-data">${dataStr}</div>
+    <div class="capa-marca"><div class="nome">ASTRALIA</div><div class="filete"></div></div>
   </div>
-  ${corpo}
-  <div class="rodape">✦ ASTRALIA · ASTROLOGIA OCIDENTAL ✦</div>
+  <div class="miolo">
+    ${job.folhaDados || ''}
+    ${corpo}
+    <div class="rodape">\u2726 ASTRALIA \u2726</div>
+  </div>
 </body></html>`;
 }
 
@@ -488,6 +581,7 @@ module.exports = async function handler(req, res) {
           casal: { nomeA, nomeB },
           email: d.email || null,
           blocos,
+          folhaDados: gerarFolhaDadosHTML(resultado, nomeA, nomeB),
           partes: PROMPT.listaPartes(tipo).map(p => ({ parte: p, feito: false, tentativas: 0, ultimoErro: null })),
           secoes: [],
           status: 'gerando',
