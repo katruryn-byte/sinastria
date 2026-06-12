@@ -39,6 +39,22 @@ const ROTULO_TIPO = {
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ── Extração de JSON robusta a markdown e truncamento (padrão comprovado do Lilith) ──
+// Parser do protocolo sentinela: imune a aspas, quebras de linha e vírgulas.
+// Blocos separados por =====SECAO=====, primeira linha TITULO: xxx, resto é conteúdo.
+function extrairSentinela(texto) {
+  if (!texto) return null;
+  const blocos = texto.split(/={3,}\s*SECAO\s*={3,}/i).map(b => b.trim()).filter(Boolean);
+  const secoes = [];
+  for (const b of blocos) {
+    const m = b.match(/^TITULO:\s*(.+)$/im);
+    if (!m) continue;
+    const titulo = m[1].trim();
+    const conteudo = b.slice(b.indexOf(m[0]) + m[0].length).trim();
+    if (titulo && conteudo && conteudo.length > 80) secoes.push({ titulo, conteudo });
+  }
+  return secoes.length ? { secoes } : null;
+}
+
 function extrairJSON(texto) {
   if (!texto) return null;
   let limpo = texto.replace(/```json/gi, '').replace(/```/g, '').trim();
@@ -508,7 +524,7 @@ module.exports = async function handler(req, res) {
       if (!resp) throw new Error('Claude sem resposta (rede/timeout após retries)');
       if (resp.__erro) throw new Error(resp.__erro);
       const texto = resp && resp.content && resp.content[0] && resp.content[0].text;
-      const json = extrairJSON(texto);
+      const json = extrairSentinela(texto) || extrairJSON(texto);
       const secoes = json && Array.isArray(json.secoes)
         ? json.secoes.filter(s => s && s.titulo && s.conteudo)
         : [];
