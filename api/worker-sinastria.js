@@ -508,7 +508,7 @@ module.exports = async function handler(req, res) {
 
       if (secoes.length === 0) {
         pendente.tentativas += 1;
-        pendente.ultimoErro = 'Não foi possível extrair as seções da resposta do Claude';
+        pendente.ultimoErro = 'Extração falhou (stop_reason: ' + (resp.stop_reason || '?') + ') — início da resposta: ' + String(texto || '(vazia)').slice(0, 400).replace(/\s+/g, ' ');
         if (pendente.tentativas >= MAX_TENTATIVAS) {
           job.status = 'erro';
           await salvarJob(redis, job);
