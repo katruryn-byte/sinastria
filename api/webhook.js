@@ -4,6 +4,53 @@ const { registrarCompra } = require('./cliente');
 
 const PRODUTO_ID = 'sinastria';
 
+// ── Registro no Google Sheets (SheetDB) — DUAS linhas por compra ──
+// A Sinastria envolve duas pessoas; a planilha recebe uma linha para cada,
+// nas MESMAS colunas já usadas pelo restante da Astralia.
+// Regra contábil: o Valor entra SÓ na linha da Pessoa 1, para a soma da
+// planilha refletir a receita real (a linha 2 vai com 0.00).
+// Fire-and-forget: falha no Sheets NUNCA derruba a entrega.
+function registrarNoSheets(dados, codigoCliente, preco, recorrente) {
+  try {
+    if (!process.env.SHEETDB_URL) return;
+    const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' });
+    const tipoBase = 'sinastria-' + (dados.tipo || 'eros') + (dados.edicao ? '-' + dados.edicao : '');
+    const flagRecorrente = recorrente ? 'Sim' : 'Não';
+
+    const linhaDe = (p, papel, valor) => ({
+      Data: agora,
+      'Codigo Cliente': codigoCliente || '',
+      Nome: (p && p.nome) || dados.nome || '',
+      WhatsApp: dados.whatsapp || '',
+      Email: dados.email || '',
+      Cidade: (p && p.cidade) || '',
+      Nascimento: (p && p.data) || '',
+      Hora: (p && p.hora) || '',
+      Genero: dados.genero || '',
+      Tipo: tipoBase + ' · ' + papel,
+      Valor: valor,
+      'Cliente Recorrente': flagRecorrente
+    });
+
+    const linhas = [];
+    if (dados.pessoaA) {
+      linhas.push(linhaDe(dados.pessoaA, 'Pessoa 1', Number(preco || 0).toFixed(2)));
+      if (dados.pessoaB) linhas.push(linhaDe(dados.pessoaB, 'Pessoa 2', '0.00'));
+    } else {
+      // Fallback: payload antigo de uma pessoa só (robustez)
+      linhas.push(linhaDe(dados, 'Pessoa 1', Number(preco || 0).toFixed(2)));
+    }
+
+    fetch(process.env.SHEETDB_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: linhas })
+    }).catch(e => console.log('SheetDB sinastria:', e.message));
+  } catch (e) {
+    console.log('SheetDB sinastria (montagem):', e.message);
+  }
+}
+
 // Marca pago + registra cliente + enfileira para geracao (manual no inicio; n8n depois).
 // NAO gera a leitura aqui: produto premium e assincrono (Opus, 48h, PDF por email).
 async function processarAprovacao(sessionId, paymentId, redisUrl) {
@@ -21,9 +68,24 @@ async function processarAprovacao(sessionId, paymentId, redisUrl) {
 
   if (sessionObj.dados) {
     try {
-      const reg = await registrarCompra(sessionObj.dados, PRODUTO_ID);
+      // Enriquecimento: os dados de nascimento da compradora moram em pessoaA;
+      // espelha no nivel raiz para o cadastro do cliente (Redis) ficar completo.
+      const pA = sessionObj.dados.pessoaA || {};
+      const dadosReg = {
+        ...sessionObj.dados,
+        data: sessionObj.dados.data || pA.data,
+        hora: sessionObj.dados.hora || pA.hora,
+        cidade: sessionObj.dados.cidade || pA.cidade,
+        lat: sessionObj.dados.lat || pA.lat,
+        lon: sessionObj.dados.lon || pA.lon,
+        preco: sessionObj.preco
+      };
+      const reg = await registrarCompra(dadosReg, PRODUTO_ID);
       sessionObj.codigoCliente = reg.codigo;
       sessionObj.novoCliente = reg.novoCliente;
+
+      // Ponte com o Google Sheets: duas linhas (Pessoa 1 e Pessoa 2)
+      registrarNoSheets(sessionObj.dados, reg.codigo, sessionObj.preco, !reg.novoCliente);
     } catch (e) { console.error('Erro ao registrar cliente:', e.message); }
   }
 
@@ -92,4 +154,3 @@ module.exports = async function handler(req, res) {
 }
 
 module.exports.processarAprovacao = processarAprovacao;
-
