@@ -370,11 +370,15 @@ Escreva EXCLUSIVAMENTE as seções abaixo, na ordem, com a profundidade indicada
 ${instrucoesSecoes}
 
 ═══════════════════════════════════════════════
-FORMATO DE SAÍDA — OBRIGATÓRIO
+FORMATO DE SAÍDA — OBRIGATÓRIO (PROTOCOLO SENTINELA)
 ═══════════════════════════════════════════════
-Responda APENAS com JSON válido, sem nenhum texto antes ou depois, sem markdown, sem comentários:
-{"secoes":[{"titulo":"título exato da seção","conteudo":"texto completo da seção, com parágrafos separados por \\n\\n"}]}
-Uma entrada por seção pedida, na ordem. Português impecável do Brasil.`;
+NÃO use JSON. NÃO use markdown. Responda APENAS na estrutura abaixo, repetida uma vez por seção pedida, na ordem:
+
+=====SECAO=====
+TITULO: título exato da seção
+texto completo da seção, em parágrafos normais separados por linha em branco
+
+Regras: comece a resposta direto com =====SECAO===== (nada antes dela); não escreva nada após a última seção; não numere os blocos fora do título. Dentro do texto escreva livremente — aspas, travessões, vírgulas e quebras de linha são bem-vindos e seguros. Português impecável do Brasil.`;
 }
 
 module.exports = { buildPromptSinastria, TIPOS, ALIAS_TIPO, EDICOES, PARTES_POR_TIPO, SECOES, PISOS, listaPartes, TAB_VENUS, TAB_MARTE, TAB_CRUZADOS, TAB_LINGUAGENS, GATILHOS_TIPO };
