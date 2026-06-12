@@ -42,6 +42,13 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function extrairJSON(texto) {
   if (!texto) return null;
   let limpo = texto.replace(/```json/gi, '').replace(/```/g, '').trim();
+  // Oficina de reparos para JSON de modelo de linguagem:
+  // 1. Caracteres de controle CRUS (quebra de linha literal dentro de string é
+  //    JSON inválido e o parse explode; entre tokens, espaço é equivalente).
+  //    Os \n ESCAPADOS (barra+n) não são tocados — são dois caracteres normais.
+  limpo = limpo.replace(/[\u0000-\u001F]/g, ' ');
+  // 2. Vírgulas penduradas antes de fechamento: {"a":1,} → {"a":1}
+  limpo = limpo.replace(/,\s*([}\]])/g, '$1');
   const primeiro = limpo.indexOf('{');
   if (primeiro === -1) return null;
   const ultimo = limpo.lastIndexOf('}');
