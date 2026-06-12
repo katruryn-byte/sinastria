@@ -260,6 +260,7 @@ module.exports = async function handler(req, res) {
       const dados = {
         email: req.query.email || 'katruryn@gmail.com',
         tipo,
+        edicao: req.query.edicao || null,
         pessoaA: { nome: 'Maria Clara', data: '1992-03-15', hora: '14:30', cidade: 'Fortaleza', lat: -3.7319, lon: -38.5267 },
         pessoaB: { nome: 'João Pedro', data: '1989-11-22', hora: '08:15', cidade: 'Fortaleza', lat: -3.7319, lon: -38.5267 }
       };
@@ -326,7 +327,8 @@ module.exports = async function handler(req, res) {
         }
         const compra = JSON.parse(item);
         const d = compra.dados || {};
-        const tipo = (d.tipo && PROMPT.TIPOS.includes(d.tipo)) ? d.tipo : 'eros';
+        const tipoBruto = (PROMPT.ALIAS_TIPO && PROMPT.ALIAS_TIPO[d.tipo]) || d.tipo;
+        const tipo = (tipoBruto && PROMPT.TIPOS.includes(tipoBruto)) ? tipoBruto : 'eros';
         if (!d.pessoaA || !d.pessoaB || !d.pessoaA.data || !d.pessoaB.data) {
           await redis.lPush('sinastria:erro', compra.sessionId || 'sem-id');
           return res.status(200).json({ status: 'dados_invalidos', sessionId: compra.sessionId });
@@ -338,9 +340,12 @@ module.exports = async function handler(req, res) {
         const nomeB = d.pessoaB.nome || 'Pessoa B';
         const blocos = montarBlocos(resultado, nomeA, nomeB);
 
+        const edicao = (d.edicao && PROMPT.EDICOES && PROMPT.EDICOES.includes(d.edicao)) ? d.edicao : null;
+
         job = {
           sessionId: compra.sessionId,
           tipo,
+          edicao,
           casal: { nomeA, nomeB },
           email: d.email || null,
           blocos,
@@ -374,7 +379,7 @@ module.exports = async function handler(req, res) {
       }
 
       // ── Gera UMA parte ──
-      const prompt = PROMPT.buildPromptSinastria(job.casal, job.blocos, job.tipo, pendente.parte);
+      const prompt = PROMPT.buildPromptSinastria(job.casal, job.blocos, job.tipo, pendente.parte, job.edicao || null);
       const resp = await chamarClaude(prompt, MAX_TOKENS);
       const texto = resp && resp.content && resp.content[0] && resp.content[0].text;
       const json = extrairJSON(texto);
