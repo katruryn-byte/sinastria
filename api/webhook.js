@@ -4,16 +4,15 @@ const { registrarCompra } = require('./cliente');
 
 const PRODUTO_ID = 'sinastria';
 
-// ── Registro no Google Sheets (SheetDB) — DUAS linhas por compra ──
-// Colunas da planilha real: Data, Nome, WhatsApp, Email, Cidade, Nascimento, Hora,
-// Tipo, Valor, Codigo Cliente, Genero, Cliente Recorrente, Lat, Lon, Timezone, CPF,
-// Status Pagamento, Payment ID MP, Sessao ID, PDF Drive URL, Email Enviado Em, Status Entrega.
-// Regras: Valor e CPF só na linha da Pessoa 1 (soma da planilha e privacidade);
-// Email Enviado Em / Status Entrega são carimbados DEPOIS, pelo worker, na entrega.
-// Fire-and-forget: falha no Sheets NUNCA derruba a esteira.
+// ── Registro na planilha (Google Apps Script) — DUAS linhas por compra ──
+// O Apps Script lê os cabeçalhos da linha 1 e faz upsert pela coluna "Sessao ID".
+// Como as duas pessoas compartilham a compra, a Pessoa 2 ganha sufixo "-B" na
+// chave (senão a segunda linha sobrescreveria a primeira). Valor e CPF só na
+// linha 1. Email Enviado Em / Status Entrega são carimbados depois, pelo worker.
+// Fire-and-forget: falha na planilha NUNCA derruba a esteira.
 function registrarNoSheets(dados, codigoCliente, preco, recorrente, sessionId, paymentId) {
   try {
-    if (!process.env.SHEETDB_URL) return;
+    if (!process.env.APPS_SCRIPT_URL) return;
     const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' });
     const tipoBase = 'sinastria-' + (dados.tipo || 'eros') + (dados.edicao ? '-' + dados.edicao : '');
     const flagRecorrente = recorrente ? 'Sim' : 'Não';
@@ -27,46 +26,48 @@ function registrarNoSheets(dados, codigoCliente, preco, recorrente, sessionId, p
       };
     } catch (e) {}
 
-    const linhaDe = (p, papel, valor, cpf) => ({
-      Data: agora,
-      Nome: (p && p.nome) || dados.nome || '',
-      WhatsApp: dados.whatsapp || '',
-      Email: dados.email || '',
-      Cidade: (p && p.cidade) || '',
-      Nascimento: (p && p.data) || '',
-      Hora: (p && p.hora) || '',
-      Tipo: tipoBase + ' · ' + papel,
-      Valor: valor,
+    const linhaDe = (p, papel, valor, cpf, chave) => ({
+      'Data': agora,
+      'Nome': (p && p.nome) || dados.nome || '',
+      'WhatsApp': dados.whatsapp || '',
+      'Email': dados.email || '',
+      'Cidade': (p && p.cidade) || '',
+      'Nascimento': (p && p.data) || '',
+      'Hora': (p && p.hora) || '',
+      'Tipo': tipoBase + ' · ' + papel,
+      'Valor': valor,
       'Codigo Cliente': codigoCliente || '',
-      Genero: dados.genero || '',
+      'Genero': dados.genero || '',
       'Cliente Recorrente': flagRecorrente,
-      Lat: (p && p.lat) || '',
-      Lon: (p && p.lon) || '',
-      Timezone: tzDe(p),
-      CPF: cpf || '',
+      'Lat': (p && p.lat) || '',
+      'Lon': (p && p.lon) || '',
+      'Timezone': tzDe(p),
+      'CPF': cpf || '',
       'Status Pagamento': 'approved',
       'Payment ID MP': paymentId ? String(paymentId) : '',
-      'Sessao ID': sessionId || '',
-      'PDF Drive URL': '',
-      'Email Enviado Em': '',
+      'Sessao ID': chave,
       'Status Entrega': 'em produção'
     });
 
     const linhas = [];
     if (dados.pessoaA) {
-      linhas.push(linhaDe(dados.pessoaA, 'Pessoa 1', Number(preco || 0).toFixed(2), dados.cpf || ''));
-      if (dados.pessoaB) linhas.push(linhaDe(dados.pessoaB, 'Pessoa 2', '0.00', ''));
+      linhas.push(linhaDe(dados.pessoaA, 'Pessoa 1', Number(preco || 0).toFixed(2), dados.cpf || '', sessionId || ''));
+      if (dados.pessoaB) linhas.push(linhaDe(dados.pessoaB, 'Pessoa 2', '', '', (sessionId || '') + '-B'));
     } else {
-      linhas.push(linhaDe(dados, 'Pessoa 1', Number(preco || 0).toFixed(2), dados.cpf || ''));
+      linhas.push(linhaDe(dados, 'Pessoa 1', Number(preco || 0).toFixed(2), dados.cpf || '', sessionId || ''));
     }
 
-    fetch(process.env.SHEETDB_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: linhas })
-    }).catch(e => console.log('SheetDB sinastria:', e.message));
+    (async () => {
+      for (const linha of linhas) {
+        await fetch(process.env.APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(linha)
+        });
+      }
+    })().catch(e => console.log('Sheets (Apps Script):', e.message));
   } catch (e) {
-    console.log('SheetDB sinastria (montagem):', e.message);
+    console.log('Sheets (montagem):', e.message);
   }
 }
 
