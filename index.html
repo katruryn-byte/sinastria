@@ -455,7 +455,7 @@ function validar(){
   return true;
 }
 
-function montarDados(){
+function montarDadosForm(){
   const v=id=>document.getElementById(id).value;
   const pessoa=s=>({ nome:v('f-nome-'+s).trim(), data:v('f-data-'+s), hora:v('f-hora-'+s)||'12:00',
     cidade:v('f-cidade-'+s).trim(), lat:v('f-lat-'+s), lon:v('f-lon-'+s) });
