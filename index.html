@@ -90,6 +90,8 @@ footer{border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center}
 .sucesso-icon{font-size:3rem;filter:drop-shadow(0 0 20px rgba(201,168,76,.5))}
 .sucesso-box h3{font-family:'Cinzel',serif;color:#f0d080;letter-spacing:.08em;margin:.8rem 0}
 .sucesso-box p{color:var(--muted);font-size:.95rem;line-height:1.8;font-style:italic}
+.btn-wa{display:inline-block;margin-top:1.2rem;background:linear-gradient(135deg,#1ebe5d,#128c4a);color:#fff;font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.1em;padding:.85rem 1.7rem;border-radius:28px;text-decoration:none;box-shadow:0 8px 26px rgba(30,190,93,.35);transition:transform .25s}
+.btn-wa:hover{transform:translateY(-2px)}
 /* estrelas animadas (astros) */
 .stars{position:absolute;inset:0;pointer-events:none;z-index:0}
 .star{position:absolute;background:var(--accent);border-radius:50%;opacity:0;animation:twinkle linear infinite}
@@ -158,8 +160,10 @@ body{background:#070d22}
 .h2-txt{position:absolute;top:50%;left:clamp(1.2rem,5vw,5rem);transform:translateY(-50%);
   display:flex;flex-direction:column;align-items:flex-start;text-align:left;
   max-width:min(580px,52%);z-index:3}
-.nam-badge{display:inline-flex;align-items:center;gap:.5rem;border:1px solid rgba(212,169,78,.45);background:rgba(212,169,78,.08);border-radius:999px;padding:.42rem 1rem;font-size:.78rem;letter-spacing:.12em;color:#f0d9a8;text-transform:uppercase}
-.nam-badge b{color:var(--accent);font-size:.9rem}
+.nam-badge{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #e9c878;background:linear-gradient(135deg,#8d1b39,#b02a4d);border-radius:999px;padding:.5rem 1.15rem;font-size:.82rem;font-weight:700;letter-spacing:.12em;color:#fff;text-transform:uppercase;box-shadow:0 4px 22px rgba(176,42,77,.55),inset 0 1px 0 rgba(255,255,255,.18);text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.nam-badge b{color:#ffd98a;font-size:.95rem}
+.nam-prova{display:inline-flex;align-items:center;gap:.45rem;font-size:.85rem;color:#f0d9a8;letter-spacing:.04em;margin:.15rem 0 .9rem;text-shadow:0 1px 10px rgba(7,13,34,.9)}
+.nam-prova b{color:var(--gold);font-family:'Cinzel',Georgia,serif;font-size:.95rem}
 .nam-h1{font-family:'Cinzel',Georgia,serif;font-size:clamp(1.9rem,3.9vw,3.1rem);line-height:1.08;color:#f5ead2;margin:1rem 0 .2rem;letter-spacing:.01em;text-shadow:0 2px 20px rgba(7,13,34,.95)}
 .nam-h1 .estrelas{display:block;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:var(--accent);text-shadow:0 0 26px rgba(232,136,154,.35)}
 .nam-sub{font-size:.92rem;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin:.5rem 0 1rem}
@@ -208,6 +212,7 @@ body{background:#070d22}
       <div class="nam-sub">Sinastria Amorosa · Astralia</div>
       <p class="nam-desc">Um encontro kármico não acontece por acaso. Descubra a geometria sagrada que uniu vocês dois — a atração, o desejo, a Terceira Entidade que nasce quando os seus mapas se sobrepõem — e o amor que transcende o tempo.</p>
       <div class="nam-price"><span class="nam-de">R$ 147,00</span><span class="nam-por">R$ 73,50</span><span class="nam-off">50% off · só dia 12</span></div>
+      <div class="nam-prova">✨ Mais de <b>130 mil leituras</b> de mapa já realizadas</div>
       <div class="countdown"><span class="cd-label">⏳ A oferta se desfaz em</span> <span class="cd-time" id="cd-time">--</span></div>
       <a onclick="irParaCheckout()" class="btn-comprar">💛 Revelar Nosso Destino</a>
       <p class="nam-entrega">✦ Chega no seu e-mail <b>a tempo do Dia dos Namorados</b> · livro em PDF feito para vocês dois</p>
@@ -255,7 +260,7 @@ body{background:#070d22}
 <div class="section alt">
   <div class="cta">
     <h2>O Que Une<br>Vocês Dois</h2>
-    <p>A química do casal revelada com profundidade, por IA supervisionada por astróloga com 30 anos de experiência.</p>
+    <p>A química do casal revelada com profundidade, sob a supervisão de astróloga com 30 anos de experiência.</p>
     <div style="margin-bottom:1.5rem">
       <div style="font-size:.85rem;color:#8089ad;text-decoration:line-through">De R$ 147,00</div>
       <div style="font-family:'Cinzel',serif;font-size:2rem;color:var(--gold)">R$ 73,50</div>
@@ -268,7 +273,7 @@ body{background:#070d22}
 <div class="section" id="checkout">
   <div class="sec-label">✦ Garanta o Seu</div>
   <h2 class="sec-title">A Sinastria de Vocês — Edição Dia dos Namorados</h2>
-  <p class="sec-sub">Preencha seus dados e pague sem sair desta página — PIX ou cartão.</p>
+  <p class="sec-sub">Preencha seus dados e pague sem sair desta página — PIX ou cartão.<br/>✨ Mais de 130 mil leituras de mapa já realizadas.</p>
   <div class="checkout-wrap">
     <div id="form-section">
       <div class="cr-box">
@@ -361,6 +366,7 @@ body{background:#070d22}
       <div class="sucesso-icon">💞</div>
       <h3>Pagamento confirmado!</h3>
       <p><b>A Sinastria de vocês entrou em produção.</b> Ela chega no seu e-mail em algumas horas — a tempo do Dia dos Namorados. Você não precisa fazer mais nada: é só esperar o céu escrever. 💛</p>
+      <a class="btn-wa" href="https://wa.me/5585991055545" target="_blank" rel="noopener">💬 Falar com a Astralia no WhatsApp</a>
     </div>
   </div>
 </div>
@@ -376,7 +382,7 @@ body{background:#070d22}
 </div>
 <footer>
   <div class="footer-logo">Astralia</div>
-  <p class="footer-text">Leituras geradas por Inteligência Artificial, supervisionadas por astróloga com 30 anos de experiência.<br>Para fins de autoconhecimento e entretenimento espiritual · Dados protegidos pela LGPD</p>
+  <p class="footer-text">Leituras supervisionadas por astróloga com 30 anos de experiência.<br>Para fins de autoconhecimento e entretenimento espiritual · Dados protegidos pela LGPD</p>
 </footer>
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
