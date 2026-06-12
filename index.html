@@ -141,22 +141,29 @@ footer{border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center}
 /* ═══ EDIÇÃO DIA DOS NAMORADOS — override noite-azul do mockup ═══ */
 :root{--gold:#d4a94e;--accent:#e8889a;--bg:#070d22;--text:#e8e4f0;--muted:#9aa3c4;--border:rgba(212,169,78,.25)}
 body{background:#070d22}
-.hero{background:radial-gradient(ellipse at 50% 8%,#1d2c5e 0%,#0d1736 42%,#070d22 78%)!important;padding:0 0 3.4rem!important}
-.h2-txt,.hero2>.h2-txt{padding-left:1.5rem;padding-right:1.5rem}
+.hero{background:radial-gradient(ellipse at 50% 8%,#1d2c5e 0%,#0d1736 42%,#070d22 78%)!important;padding:0 0 1.6rem!important}
 .section{background:#0a1230}.section.alt{background:#070d22}
-.hero2{display:flex;flex-direction:column;align-items:center;max-width:1100px;margin:0 auto;text-align:center;position:relative;z-index:1}
-.h2-txt{padding:.2rem 0;display:flex;flex-direction:column;align-items:center}
-.hero-art{position:relative;width:100vw;max-width:1400px;margin:-1.2rem auto .4rem}
+.hero2{position:relative;width:100%;max-width:1500px;margin:0 auto;z-index:1}
+.hero-art{position:relative;width:100%;margin:0 auto}
 .hero-art img{width:100%;display:block;object-fit:cover;object-position:center 30%;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 15%,#000 60%,transparent 97%);
-          mask-image:linear-gradient(to bottom,transparent 0%,#000 15%,#000 60%,transparent 97%);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 12%,#000 72%,transparent 98%);
+          mask-image:linear-gradient(to bottom,transparent 0%,#000 12%,#000 72%,transparent 98%);
   animation:casalRespira 16s ease-in-out infinite}
+/* esfumado lateral: a copy assenta na escuridão da nebulosa, sem cara de foto colada */
+.hero-art::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to right,#070d22 0%,rgba(7,13,34,.92) 24%,rgba(7,13,34,.55) 44%,rgba(7,13,34,.12) 60%,transparent 72%);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 12%,#000 72%,transparent 98%);
+          mask-image:linear-gradient(to bottom,transparent 0%,#000 12%,#000 72%,transparent 98%)}
+/* a copy mora DENTRO da imagem, à esquerda, na altura dos olhos */
+.h2-txt{position:absolute;top:50%;left:clamp(1.2rem,5vw,5rem);transform:translateY(-50%);
+  display:flex;flex-direction:column;align-items:flex-start;text-align:left;
+  max-width:min(580px,52%);z-index:3}
 .nam-badge{display:inline-flex;align-items:center;gap:.5rem;border:1px solid rgba(212,169,78,.45);background:rgba(212,169,78,.08);border-radius:999px;padding:.42rem 1rem;font-size:.78rem;letter-spacing:.12em;color:#f0d9a8;text-transform:uppercase}
 .nam-badge b{color:var(--accent);font-size:.9rem}
-.nam-h1{font-family:'Cinzel',Georgia,serif;font-size:clamp(2rem,4.6vw,3.3rem);line-height:1.08;color:#f5ead2;margin:1.1rem 0 .2rem;letter-spacing:.01em}
+.nam-h1{font-family:'Cinzel',Georgia,serif;font-size:clamp(1.9rem,3.9vw,3.1rem);line-height:1.08;color:#f5ead2;margin:1rem 0 .2rem;letter-spacing:.01em;text-shadow:0 2px 20px rgba(7,13,34,.95)}
 .nam-h1 .estrelas{display:block;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:var(--accent);text-shadow:0 0 26px rgba(232,136,154,.35)}
 .nam-sub{font-size:.92rem;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin:.5rem 0 1rem}
-.nam-desc{font-size:1.02rem;line-height:1.75;color:#c4cbe6;max-width:46ch;margin:0 0 1.3rem}
+.nam-desc{font-size:1.02rem;line-height:1.75;color:#d4daf0;max-width:44ch;margin:0 0 1.2rem;text-shadow:0 1px 14px rgba(7,13,34,.9)}
 .nam-price{display:flex;align-items:baseline;gap:.9rem;margin:0 0 .4rem}
 .nam-de{font-size:1rem;color:#8089ad;text-decoration:line-through}
 .nam-por{font-family:'Cinzel',Georgia,serif;font-size:2.3rem;color:var(--gold);text-shadow:0 0 30px rgba(212,169,78,.35)}
@@ -167,7 +174,12 @@ body{background:#070d22}
 @keyframes subirCoracao{0%{transform:translateY(24px) scale(.55);opacity:0}10%{opacity:.9}55%{opacity:.45}100%{transform:translateY(-460px) scale(1.2);opacity:0}}
 .nam-entrega{font-size:.82rem;color:#b7c0e0;margin-top:.9rem}
 .nam-entrega b{color:var(--gold)}
-@media(max-width:760px){.hero-art img{min-height:300px;object-position:62% 30%}.nam-desc{margin:0 auto 1.3rem}.nam-price{justify-content:center}}
+@media(max-width:860px){
+  .h2-txt{position:static;transform:none;align-items:center;text-align:center;max-width:100%;padding:0 1.4rem;margin-top:-3.2rem}
+  .hero-art img{min-height:300px;max-height:46vh;object-position:66% 28%}
+  .hero-art::after{background:linear-gradient(to bottom,transparent 38%,rgba(7,13,34,.55) 70%,#070d22 97%)}
+  .nam-desc{margin:0 auto 1.2rem}.nam-price{justify-content:center}
+}
 </style>
 </head>
 <body>
