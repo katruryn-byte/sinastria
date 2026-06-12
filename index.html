@@ -211,11 +211,12 @@ body{background:#070d22}
       <h1 class="nam-h1">Seu Amor Foi Escrito <span class="estrelas">Nas Estrelas</span></h1>
       <div class="nam-sub">Sinastria Amorosa · Astralia</div>
       <p class="nam-desc">Um encontro kármico não acontece por acaso. Descubra a geometria sagrada que uniu vocês dois — a atração, o desejo, a Terceira Entidade que nasce quando os seus mapas se sobrepõem — e o amor que transcende o tempo.</p>
-      <div class="nam-price"><span class="nam-de">R$ 147,00</span><span class="nam-por">R$ 73,50</span><span class="nam-off">50% off · só dia 12</span></div>
+      <div class="nam-price"><span class="nam-de">R$ 147,00</span><span class="nam-por">R$ 73,50</span><span class="nam-off">50% off · estendida até 30/06</span></div>
       <div class="nam-prova">✨ Mais de <b>130 mil leituras</b> de mapa já realizadas</div>
+      <div class="nam-prova" style="font-style:italic">❤ O sucesso foi tanto que estendemos a Edição Dia dos Namorados até o fim do mês</div>
       <div class="countdown"><span class="cd-label">⏳ A oferta se desfaz em</span> <span class="cd-time" id="cd-time">--</span></div>
       <a onclick="irParaCheckout()" class="btn-comprar">💛 Revelar Nosso Destino</a>
-      <p class="nam-entrega">✦ Chega no seu e-mail <b>a tempo do Dia dos Namorados</b> · livro em PDF feito para vocês dois</p>
+      <p class="nam-entrega">✦ Chega no seu e-mail <b>em poucas horas</b> · livro em PDF feito para vocês dois</p>
       <p class="hero-seguro">🔒 Pagamento seguro via Mercado Pago · PIX e Cartão · Dados protegidos pela LGPD</p>
     </div>
   </div>
@@ -365,7 +366,7 @@ body{background:#070d22}
     <div class="sucesso-box" id="sucesso-box">
       <div class="sucesso-icon">💞</div>
       <h3>Pagamento confirmado!</h3>
-      <p><b>A Sinastria de vocês entrou em produção.</b> Ela chega no seu e-mail em algumas horas — a tempo do Dia dos Namorados. Você não precisa fazer mais nada: é só esperar o céu escrever. 💛</p>
+      <p><b>A Sinastria de vocês entrou em produção.</b> Ela chega no seu e-mail em algumas horas, pronta para celebrar o amor de vocês. Você não precisa fazer mais nada: é só esperar o céu escrever. 💛</p>
       <a class="btn-wa" href="https://wa.me/5585991055545" target="_blank" rel="noopener">💬 Falar com a Astralia no WhatsApp</a>
     </div>
   </div>
@@ -525,7 +526,7 @@ function iniciarPolling(){
 
 
 // ===== Countdown fixo: fim do Dia dos Namorados (12/06, 23:59, horário de Fortaleza) =====
-(function(){ const fim=new Date('2026-06-12T23:59:59-03:00').getTime(); const el=document.getElementById('cd-time');
+(function(){ const fim=new Date('2026-06-30T23:59:59-03:00').getTime(); const el=document.getElementById('cd-time');
   function tick(){ let d=fim-Date.now(); if(d<0)d=0;
     const hrs=Math.floor(d/36e5),min=Math.floor(d%36e5/6e4),seg=Math.floor(d%6e4/1e3);
     if(el) el.textContent=`${String(hrs).padStart(2,'0')}h ${String(min).padStart(2,'0')}m ${String(seg).padStart(2,'0')}s`; }
