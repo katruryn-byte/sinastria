@@ -290,7 +290,7 @@ body{background:#070d22}
           <div class="fd"><label>WhatsApp</label><input type="tel" id="f-whatsapp" placeholder="(00) 00000-0000"/></div>
           <div class="fd"><label>E-mail</label><input type="email" id="f-email" placeholder="seu@email.com"/></div>
         </div>
-        <div class="fd" id="campo-cpf" style="display:none"><label>CPF (obrigatório para cartão)</label><input type="text" id="f-cpf" placeholder="000.000.000-00" maxlength="14"/></div>
+        <div class="fd" id="campo-cpf"><label>CPF (obrigatório para o pagamento)</label><input type="text" id="f-cpf" placeholder="000.000.000-00" maxlength="14"/></div>
       </div>
       <div class="fbox">
         <div class="fbox-title">💛 Pessoa 1 — Você</div>
@@ -413,7 +413,6 @@ function selecionarMetodo(m){
   document.getElementById('m-pix').classList.toggle('ativo', m==='pix');
   document.getElementById('m-cartao').classList.toggle('ativo', m==='cartao');
   document.getElementById('form-cartao').classList.toggle('ativo', m==='cartao');
-  document.getElementById('campo-cpf').style.display = m==='cartao' ? 'block' : 'none';
   document.getElementById('btn-pagar').textContent = m==='pix' ? '⚡ Gerar PIX — '+formatBRL(precoFinal()) : '💳 Pagar '+formatBRL(precoFinal());
 }
 
@@ -450,8 +449,8 @@ function validar(){
   if(!v('f-nome-b')||!v('f-data-b')){ erro('Preencha o nome e a data de nascimento da Pessoa 2.'); return false; }
   if(!v('f-lat-a')){ erro('Selecione a cidade da Pessoa 1 na lista, para fixar as coordenadas.'); return false; }
   if(!v('f-lat-b')){ erro('Selecione a cidade da Pessoa 2 na lista, para fixar as coordenadas.'); return false; }
+  if(document.getElementById('f-cpf').value.replace(/\D/g,'').length!==11){ erro('Informe um CPF válido — o Mercado Pago exige para PIX e cartão.'); return false; }
   if(!document.getElementById('lgpd-aceite').checked){ erro('É preciso aceitar o tratamento de dados (LGPD) para continuar.'); return false; }
-  if(metodoSelecionado==='cartao' && document.getElementById('f-cpf').value.replace(/\D/g,'').length!==11){ erro('Informe um CPF válido para pagar no cartão.'); return false; }
   return true;
 }
 
