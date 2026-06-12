@@ -264,6 +264,22 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ status: 'relatorio', fila_sinastria: fila, erros: erro, ativo, lock_ocupado: !!lock, job });
     }
 
+    // ── Modo verErros: lê a fila de erros (diagnóstico) ──
+    // ?teste=ADMIN_SECRET&verErros=1
+    if (ehTeste && req.query.verErros) {
+      const erros = await redis.lRange('sinastria:erro', 0, 9);
+      await redis.quit();
+      return res.status(200).json({ status: 'erros', total: erros.length, erros: erros.map(e => { try { return JSON.parse(e); } catch (x) { return e; } }) });
+    }
+
+    // ── Modo limparErros: esvazia a fila de erros após o conserto ──
+    if (ehTeste && req.query.limparErros) {
+      const n = await redis.lLen('sinastria:erro');
+      await redis.del('sinastria:erro');
+      await redis.quit();
+      return res.status(200).json({ status: 'erros_limpos', removidos: n });
+    }
+
     // ── SEED (teste): compra fictícia direto na fila ──
     if (ehTeste && req.query.seed) {
       const tipo = String(req.query.seed);
