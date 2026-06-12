@@ -270,6 +270,22 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ status: 'relatorio', fila_sinastria: fila, erros: erro, ativo, lock_ocupado: !!lock, job });
     }
 
+    // ── Espelho da chave Anthropic: inspeção sem expor o segredo ──
+    // ?teste=ADMIN_SECRET&chave=1
+    if (ehTeste && req.query.chave) {
+      const k = process.env.ANTHROPIC_API_KEY || '';
+      await redis.quit();
+      return res.status(200).json({
+        status: 'chave',
+        existe: !!k,
+        tamanho: k.length,
+        comeca_com: k.slice(0, 11),
+        termina_com: '...' + k.slice(-4),
+        tem_espaco_ou_quebra: /\s/.test(k),
+        formato_esperado: 'sk-ant-..., ~100+ caracteres, sem espaços'
+      });
+    }
+
     // ── Sonda da ponte com a planilha: GET no Apps Script ──
     // ?teste=ADMIN_SECRET&sheets=1
     if (ehTeste && req.query.sheets) {
